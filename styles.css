@@ -117,9 +117,8 @@ body {
     border-radius: 5px;
 }
 
-.form-group input[type="radio"] {
-    width: auto;
-    margin-right: 5px;
+.form-group input[type="radio"], .form-group input[type="checkbox"] {
+    display: none; /* Verberg de standaard radio/checkbox */
 }
 
 .form-group .radio-group {
@@ -133,31 +132,10 @@ body {
     margin-top: 20px;
 }
 
-.checkbox-group {
-    margin-top: 10px;
-}
-
-.checkbox-item {
-    margin-bottom: 10px;
-}
-
-.checkbox-item input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-.checkbox-label {
-    display: inline-block;
-    font-size: 16px;
-}
-
 .switch {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
-}
-
-.switch input[type="radio"] {
-    display: none;
 }
 
 .switch-label {
@@ -166,17 +144,47 @@ body {
     border-radius: 5px;
     background-color: #f0f0f0;
     margin-right: 10px;
+    display: flex;
+    align-items: center;
 }
 
-.switch input[type="radio"]:checked + .switch-label {
+.switch input[type="radio"]:checked + .switch-label,
+.switch input[type="checkbox"]:checked + .switch-label {
     background-color: #28a745;
     color: white;
 }
 
-.radio-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+.coverage-switch .switch-label {
+    padding: 8px 15px; /* Compacter voor dekkingen */
+    font-size: 14px;
+}
+
+.confirmation-switch .switch-label {
+    padding: 10px 15px; /* Iets meer padding voor langere labels */
+    font-size: 14px;
+    width: 100%; /* Volle breedte voor consistentie */
+    box-sizing: border-box;
+    margin-right: 0; /* Geen marge rechts, want elke switch staat apart */
+    margin-bottom: 10px; /* Afstand tussen de switches */
+}
+
+.always-selected {
+    background-color: #28a745; /* Altijd groen */
+    color: white;
+    cursor: default; /* Geen pointer om aan te geven dat het niet klikbaar is */
+}
+
+.coverage-options {
+    margin-top: 10px;
+}
+
+.main-coverage, .extra-options {
+    margin-bottom: 20px;
+}
+
+.main-coverage h4, .extra-options h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
 }
 
 .radio-label {
@@ -431,6 +439,11 @@ button:hover {
         text-align: center;
     }
 
+    .confirmation-switch .switch-label {
+        padding: 8px 10px; /* Iets compacter op mobiel */
+        font-size: 12px; /* Kleiner lettertype voor lange labels */
+    }
+
     .navigation-buttons {
         flex-direction: column;
         align-items: center;
@@ -472,39 +485,42 @@ button:hover {
         max-width: 400px;
         padding: 15px;
     }
-	.loading-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
 
-.loader {
-    border: 8px solid #f3f3f3; /* Lichtgrijs */
-    border-top: 8px solid #3498db; /* Blauw */
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;
-}
+    .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+    .loader {
+        border: 8px solid #f3f3f3; /* Lichtgrijs */
+        border-top: 8px solid #3498db; /* Blauw */
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
 
-.loading-screen p {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #333;
-}
-.hidden {
-    display: none;
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-screen p {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .hidden {
+        display: none;
+    }
 }
