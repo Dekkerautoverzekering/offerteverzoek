@@ -1,278 +1,526 @@
-let currentStep = 0;
-showStep(currentStep);
-
-function showStep(n) {
-    let steps = document.getElementsByClassName("step-content");
-    for (let i = 0; i < steps.length; i++) {
-        steps[i].style.display = 'none';
-    }
-    steps[n].style.display = 'block';
-    
-    if (n == 0) {
-        document.getElementById("prevBtn").style.display = 'none';
-    } else {
-        document.getElementById("prevBtn").style.display = 'inline';
-    }
-    if (n == (steps.length - 1)) {
-        document.getElementById("nextBtn").style.display = 'none';
-    } else {
-        document.getElementById("nextBtn").style.display = 'inline';
-    }
-    updateStepIndicator(n);
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e0f7fa;
+    margin: 0;
+    padding: 20px;
 }
 
-function nextPrev(n) {
-    let steps = document.getElementsByClassName("step-content");
-    steps[currentStep].style.display = 'none';
-    currentStep = currentStep + n;
-    if (currentStep >= steps.length) {
-        return false;
-    }
-    showStep(currentStep);
+.form-container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-function updateStepIndicator(n) {
-    let indicators = document.getElementsByClassName("step");
-    for (let i = 0; i < indicators.length; i++) {
-        indicators[i].classList.remove("active-step");
-    }
-    indicators[n].classList.add("active-step");
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-// Functie om voertuiggegevens op te halen via RDW API
-async function fetchVehicleData(kenteken) {
-    const url = `https://opendata.rdw.nl/resource/m9d7-ebf2.json?kenteken=${kenteken.replace(/-/g, '')}`;
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data.length > 0) {
-            const vehicle = data[0];
-            document.getElementById('merk').value = vehicle.merk || 'Onbekend';
-            document.getElementById('model').value = vehicle.handelsbenaming || 'Onbekend';
-        } else {
-            document.getElementById('merk').value = 'Kenteken niet gevonden';
-            document.getElementById('model').value = '';
-        }
-    } catch (error) {
-        console.error("Fout bij ophalen voertuiggegevens:", error);
-        document.getElementById('merk').value = 'Fout bij ophalen';
-        document.getElementById('model').value = '';
-    }
+.logo img {
+    max-width: 450px;
+    height: auto;
 }
 
-// Event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    const kentekenInput = document.getElementById('kenteken');
-    kentekenInput.addEventListener('input', function() {
-        const kenteken = kentekenInput.value.trim();
-        if (kenteken.length >= 6) {
-            fetchVehicleData(kenteken);
-        }
-    });
-
-    // Adres ophalen
-    const postcodeInput = document.getElementById('postcode');
-    const huisnummerInput = document.getElementById('huisnummer');
-    postcodeInput.addEventListener('input', checkAddress);
-    huisnummerInput.addEventListener('input', checkAddress);
-
-    function checkAddress() {
-        const postcode = postcodeInput.value.replace(/\s/g, '');
-        const huisnummer = huisnummerInput.value;
-        if (postcode.length === 6 && huisnummer) {
-            fetchAddress(postcode, huisnummer);
-        }
-    }
-
-    async function fetchAddress(postcode, huisnummer) {
-        const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${postcode} ${huisnummer}&rows=1`;
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            if (data.response.numFound > 0) {
-                const adres = data.response.docs[0];
-                const volledigAdres = `${adres.straatnaam} ${adres.huisnummer}, ${adres.woonplaatsnaam}`;
-                document.getElementById('volledig-adres').value = volledigAdres;
-            } else {
-                document.getElementById('volledig-adres').value = "Adres niet gevonden";
-            }
-        } catch (error) {
-            console.error("Fout bij ophalen adres:", error);
-            document.getElementById('volledig-adres').value = "Fout bij ophalen adres";
-        }
-    }
-
-    // Zakelijk/particulier logica voor bedrijfsnaam
-    const particulierRadio = document.getElementById('particulier');
-    const zakelijkRadio = document.getElementById('zakelijk');
-    const bedrijfsnaamContainer = document.getElementById('bedrijfsnaam-container');
-
-    function toggleBedrijfsnaam() {
-        if (zakelijkRadio.checked) {
-            bedrijfsnaamContainer.classList.remove('hidden');
-        } else {
-            bedrijfsnaamContainer.classList.add('hidden');
-        }
-    }
-
-    particulierRadio.addEventListener('change', toggleBedrijfsnaam);
-    zakelijkRadio.addEventListener('change', toggleBedrijfsnaam);
-    toggleBedrijfsnaam(); // Initialiseer de status
-
-    // Stel standaarddatum in voor "datum-verzoek"
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
-    document.getElementById('datum-verzoek').value = formattedDate;
-});
-
-// Modal en verzend logica
-function showModal() {
-    const form = document.getElementById('quote-form');
-    const formData = new FormData(form);
-    let summaryHtml = "<strong>Ingevulde gegevens:</strong><ul>";
-
-    for (let [key, value] of formData.entries()) {
-        if (value && value !== 'on' && key !== 'main_coverage' && key !== 'extra_schadeverzekering' && key !== 'extra_rechtsbijstand' && key !== 'ford-dekker' && key !== 'waarheid') {
-            summaryHtml += `<li>${key}: ${value}</li>`;
-        }
-    }
-
-    const mainCoverage = formData.get('main_coverage');
-    summaryHtml += `<li>Hoofddekking: ${mainCoverage}</li>`;
-
-    const extraSchadeverzekering = formData.has('extra_schadeverzekering') ? 'Ja' : 'Nee';
-    summaryHtml += `<li>Schadeverzekering voor Inzittenden: ${extraSchadeverzekering}</li>`;
-
-    const extraRechtsbijstand = formData.has('extra_rechtsbijstand') ? 'Ja' : 'Nee';
-    summaryHtml += `<li>Rechtsbijstand: ${extraRechtsbijstand}</li>`;
-
-    const fordDekker = formData.has('ford-dekker') ? 'Ja' : 'Nee';
-    summaryHtml += `<li>Verzekerde voertuig betreft een Ford gekocht bij de Dekkerautogroep: ${fordDekker}</li>`;
-
-    const waarheid = formData.has('waarheid') ? 'Ja' : 'Nee';
-    summaryHtml += `<li>Gegevens naar waarheid ingevuld: ${waarheid}</li>`;
-
-    summaryHtml += "</ul>";
-
-    document.getElementById('summary').innerHTML = summaryHtml;
-    document.getElementById('confirmationModal').style.display = 'block';
+.footer-logo {
+    text-align: center;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    margin-top: 20px;
 }
 
-function closeModal() {
-    document.getElementById('confirmationModal').style.display = 'none';
-    document.getElementById('resultMessage').style.display = 'none';
+.footer-logo img {
+    max-width: 450px;
+    height: auto;
 }
 
-function handleSubmit(isConfirmed) {
-    document.getElementById('confirmationModal').style.display = 'none';
-    const resultTextElement = document.getElementById('resultText');
-
-    if (isConfirmed) {
-        const form = document.getElementById('quote-form');
-        const formData = new FormData(form);
-        let emailBody = "Offerteverzoek Dekkerautoverzekering\n\n";
-        const email = formData.get('email');
-
-        for (let [key, value] of formData.entries()) {
-            if (value && value !== 'on' && key !== 'main_coverage' && key !== 'extra_schadeverzekering' && key !== 'extra_rechtsbijstand' && key !== 'ford-dekker' && key !== 'waarheid') {
-                emailBody += `${key}: ${value}\n`;
-            }
-        }
-
-        const mainCoverage = formData.get('main_coverage');
-        emailBody += `Hoofddekking: ${mainCoverage}\n`;
-
-        const extraSchadeverzekering = formData.has('extra_schadeverzekering') ? 'Ja' : 'Nee';
-        emailBody += `Schadeverzekering voor Inzittenden: ${extraSchadeverzekering}\n`;
-
-        const extraRechtsbijstand = formData.has('extra_rechtsbijstand') ? 'Ja' : 'Nee';
-        emailBody += `Rechtsbijstand: ${extraRechtsbijstand}\n`;
-
-        const fordDekker = formData.has('ford-dekker') ? 'Ja' : 'Nee';
-        emailBody += `Verzekerde voertuig betreft een Ford gekocht bij de Dekkerautogroep: ${fordDekker}\n`;
-
-        const waarheid = formData.has('waarheid') ? 'Ja' : 'Nee';
-        emailBody += `Gegevens naar waarheid ingevuld: ${waarheid}\n`;
-
-        console.log("Start verzending...");
-
-        emailjs.send("service_cjvbpt6", "template_lglwx6m", {
-            message: emailBody,
-            reply_to: email
-        })
-        .then(() => {
-            console.log("Service e-mail succesvol verzonden");
-            return emailjs.send("service_cjvbpt6", "template_20jbe7c", {
-                to_email: email,
-                email: email,
-                message: "Bedankt voor uw offerteverzoek!\n\nHieronder uw ingevulde gegevens:\n" + emailBody
-            });
-        })
-        .then(() => {
-            console.log("Klant e-mail succesvol verzonden");
-            resultTextElement.innerHTML = `
-                <strong>Uw offerteverzoek is verzonden!</strong><br><br>
-                Wij danken u voor uw interesse.<br>
-                Een bevestiging is gestuurd naar ${email}.<br>
-                Binnen 2 werkdagen ontvangt u een offerte.
-            `;
-            document.getElementById('resultMessage').style.display = 'block';
-            document.getElementById('quote-form').style.display = 'none';
-            document.querySelector('.navigation-buttons').style.display = 'none';
-
-            setTimeout(() => {
-                document.getElementById('resultMessage').style.display = 'none';
-                document.getElementById('loadingScreen').style.display = 'flex';
-                
-                setTimeout(() => {
-                    window.location.href = 'https://www.klaasvis.nl';
-                }, 3000);
-            }, 2000);
-        })
-        .catch((error) => {
-            console.error("Fout bij verzenden:", error);
-            resultTextElement.innerHTML = `
-                Er is een fout opgetreden: ${error.text}<br>
-                Controleer de console (F12) voor meer info.
-            `;
-            document.getElementById('resultMessage').style.display = 'block';
-        });
-    } else {
-        resultTextElement.innerHTML = `
-            U wordt teruggeleid naar het formulier om uw antwoorden te controleren.
-        `;
-        document.getElementById('resultMessage').style.display = 'block';
-    }
+.footer {
+    background: #007BFF;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-// Chatbase chatbot integratie
-(function() {
-    if (!window.chatbase || window.chatbase('getState') !== 'initialized') {
-        window.chatbase = (...args) => {
-            if (!window.chatbase.q) {
-                window.chatbase.q = [];
-            }
-            window.chatbase.q.push(args);
-        };
-        window.chatbase = new Proxy(window.chatbase, {
-            get(target, prop) {
-                if (prop === 'q') {
-                    return target.q;
-                }
-                return (...args) => target(prop, ...args);
-            }
-        });
+.footer p {
+    margin: 10px 0;
+}
+
+.footer a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+.step-indicators {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.step {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #f0f0f0;
+    font-weight: bold;
+}
+
+.active-step {
+    background: #28a745;
+    color: #fff;
+    border-color: #28a745;
+}
+
+.step-content {
+    display: none;
+}
+
+.step-content.active {
+    display: block;
+}
+
+.conditional {
+    display: none;
+}
+
+.conditional.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.form-group input[type="radio"], .form-group input[type="checkbox"] {
+    display: none; /* Verberg de standaard radio/checkbox */
+}
+
+.form-group .radio-group {
+    display: flex;
+    gap: 15px;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.switch {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.switch-label {
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.switch input[type="radio"]:checked + .switch-label,
+.switch input[type="checkbox"]:checked + .switch-label {
+    background-color: #28a745;
+    color: white;
+}
+
+.coverage-switch .switch-label {
+    padding: 8px 15px; /* Compacter voor dekkingen */
+    font-size: 14px;
+}
+
+.confirmation-switch .switch-label {
+    padding: 10px 15px; /* Iets meer padding voor langere labels */
+    font-size: 14px;
+    width: 100%; /* Volle breedte voor consistentie */
+    box-sizing: border-box;
+    margin-right: 0; /* Geen marge rechts, want elke switch staat apart */
+    margin-bottom: 10px; /* Afstand tussen de switches */
+}
+
+.always-selected {
+    background-color: #28a745; /* Altijd groen */
+    color: white;
+    cursor: default; /* Geen pointer om aan te geven dat het niet klikbaar is */
+}
+
+.coverage-options {
+    margin-top: 10px;
+}
+
+.main-coverage, .extra-options {
+    margin-bottom: 20px;
+}
+
+.main-coverage h4, .extra-options h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.radio-label {
+    margin-left: 5px;
+}
+
+.signature-pad {
+    border: 1px solid #000;
+    width: 90vw;
+    max-width: 400px;
+    height: 200px;
+    background-color: #fff;
+    touch-action: none;
+}
+
+.navigation-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.prev-button {
+    background-color: #6c757d;
+}
+
+.next-button {
+    background-color: #007BFF;
+}
+
+.submit-button {
+    background-color: #28a745;
+}
+
+.text-center {
+    text-align: center;
+}
+
+canvas {
+    border: 1px solid #000;
+    display: block;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.submit-button {
+    background-color: #006400;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: block;
+    margin: 20px auto;
+    border-radius: 5px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button-group button {
+    padding: 10px 20px;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.button-group .submit-button {
+    background-color: darkgreen;
+}
+
+.download-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.download-button {
+    padding: 10px 20px;
+    background-color: blue;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.page {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+}
+
+.modal-buttons {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+.form-confirm {
+    font-family: Tahoma, sans-serif;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.form-confirm label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.form-confirm ul {
+    margin: 0;
+    padding: 0 0 0 20px;
+    list-style-type: disc;
+}
+
+.form-confirm input[type="checkbox"] {
+    margin-top: 10px;
+}
+
+.additional-info {
+    display: none;
+    margin-top: 10px;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.belanghebbende-container {
+    margin-bottom: 15px;
+}
+
+.promo {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #ffcc00;
+    color: #333;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    font-size: 14px;
+}
+
+.promo img {
+    max-width: 30px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.promo strong {
+    font-size: 16px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.content {
+    min-height: 150vh;
+}
+
+/* Mobiele aanpassingen */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
     }
-    const onLoad = function() {
-        const script = document.createElement('script');
-        script.src = 'https://www.chatbase.co/embed.min.js';
-        script.id = 'C60jEJW_QuVD7X3vE5rzE';
-        script.setAttribute('domain', 'www.chatbase.co');
-        document.body.appendChild(script);
-    };
-    if (document.readyState === 'complete') {
-        onLoad();
-    } else {
-        window.addEventListener('load', onLoad);
+
+    .form-container {
+        max-width: 100%;
+        padding: 15px;
     }
-})();
+
+    .logo img {
+        max-width: 100%;
+    }
+
+    .step-indicators {
+        flex-direction: column;
+    }
+
+    .step {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .switch {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .switch-label {
+        width: 100%;
+        padding: 8px 15px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .confirmation-switch .switch-label {
+        padding: 8px 10px; /* Iets compacter op mobiel */
+        font-size: 12px; /* Kleiner lettertype voor lange labels */
+    }
+
+    .navigation-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .navigation-buttons button {
+        width: 100%;
+        padding: 8px 15px;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .terug-button {
+        order: 2;
+    }
+
+    .prev-button {
+        order: 1;
+    }
+
+    .next-button {
+        order: 3;
+    }
+
+    .signature-pad {
+        width: 100%;
+        max-width: 300px;
+        height: 150px;
+    }
+
+    .submit-button {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .modal-content {
+        width: 90%;
+        max-width: 400px;
+        padding: 15px;
+    }
+
+    .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .loader {
+        border: 8px solid #f3f3f3; /* Lichtgrijs */
+        border-top: 8px solid #3498db; /* Blauw */
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .loading-screen p {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .hidden {
+        display: none;
+    }
+}
