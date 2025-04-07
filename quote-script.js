@@ -167,22 +167,30 @@ function handleSubmit(isConfirmed) {
             }
         }
 
-        console.log("Start verzending...");
+        console.log("EmailJS Poging 1 - Service E-mail:");
+        console.log("Service-ID:", "service_cjvbpt6");
+        console.log("Template-ID:", "template_lglwx6m");
+        console.log("Parameters:", { message: emailBody, reply_to: email });
 
-        emailjs.send("service_wgkepp8", "template_lglwx6m", {
+        emailjs.send("service_cjvbpt6", "template_lglwx6m", {
             message: emailBody,
             reply_to: email
         })
-        .then(() => {
-            console.log("Service e-mail succesvol verzonden");
-            return emailjs.send("service_wgkepp8", "template_20jbe7c", {
+        .then((response) => {
+            console.log("Service e-mail succesvol verzonden:", response);
+            console.log("EmailJS Poging 2 - Klant E-mail:");
+            console.log("Service-ID:", "service_cjvbpt6");
+            console.log("Template-ID:", "template_20jbe7c");
+            console.log("Parameters:", { to_email: email, email: email, message: "Bedankt voor uw offerteverzoek!\n\nHieronder uw ingevulde gegevens:\n" + emailBody });
+
+            return emailjs.send("service_cjvbpt6", "template_20jbe7c", {
                 to_email: email,
                 email: email,
                 message: "Bedankt voor uw offerteverzoek!\n\nHieronder uw ingevulde gegevens:\n" + emailBody
             });
         })
-        .then(() => {
-            console.log("Klant e-mail succesvol verzonden");
+        .then((response) => {
+            console.log("Klant e-mail succesvol verzonden:", response);
             resultTextElement.innerHTML = `
                 <strong>Uw offerteverzoek is verzonden!</strong><br><br>
                 Wij danken u voor uw interesse.<br>
