@@ -10,7 +10,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
         (function() {
-            emailjs.init("tyk4-LQhtdyVtKCRS"); // Jouw nieuwe Public Key
+            emailjs.init("tyk4-LQhtdyVtKCRS"); // Jouw Public Key
         })();
     </script>
 </head>
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="voornaam">Voornaam:</label>
+                    <label for="voornaam">Voorletter(s):</label>
                     <input type="text" id="voornaam" name="voornaam" autocomplete="given-name" required>
                 </div>
                 <div class="form-group">
@@ -83,64 +83,76 @@
             </div>
 
             <!-- Step 2: Autogegevens -->
-<div class="step-content" id="step2">
-    <div class="form-group">
-        <label for="kenteken">Kenteken:</label>
-        <input type="text" id="kenteken" name="kenteken" autocomplete="off" required>
-    </div>
-    <div class="form-group">
-        <label for="merk">Merk:</label>
-        <input type="text" id="merk" name="merk" readonly>
-    </div>
-    <div class="form-group">
-        <label for="model">Model:</label>
-        <input type="text" id="model" name="model" readonly>
-    </div>
-    <div class="form-group">
-        <label for="meldcode">Meldcode: <span class="info-icon" title="De meldcode is de laatste 4 cijfers van het chassisnummer">ℹ️</span></label>
-        <input type="text" id="meldcode" name="meldcode" maxlength="4" required>
-    </div>
-    <div class="form-group">
-        <label>Gewenste dekking:</label>
-        <div class="checkbox-group horizontal">
-            <input type="checkbox" id="wa" name="dekking" value="wa" checked>
-            <label for="wa" class="checkbox-label">WA <span class="info-icon" title="Biedt alleen dekking bij schade aan derden en is wettelijk verplicht.">ℹ️</span></label>
-            <input type="checkbox" id="casco-beperkt" name="dekking" value="casco-beperkt">
-            <label for="casco-beperkt" class="checkbox-label">Casco Beperkt <span class="info-icon" title="Casco Beperkt biedt dekking voor schade aan het eigen voertuig als gevolg van o.a. brand, diefstal, inbraak, ruitschade.">ℹ️</span></label>
-            <input type="checkbox" id="casco-compleet" name="dekking" value="casco-compleet">
-            <label for="casco-compleet" class="checkbox-label">Casco Compleet <span class="info-icon" title="Ook wel bekend als All Risk, biedt dekking voor schade aan uw eigen voertuig als gevolg van alle van buiten komende onheilen.">ℹ️</span></label>
-            <input type="checkbox" id="schadeverzekering" name="dekking" value="schadeverzekering">
-            <label for="schadeverzekering" class="checkbox-label">Schadeverzekering voor Inzittenden <span class="info-icon" title="Dekt zowel materiële als immateriële schade van de bestuurder en inzittenden.">ℹ️</span></label>
-            <input type="checkbox" id="rechtsbijstand" name="dekking" value="rechtsbijstand">
-            <label for="rechtsbijstand" class="checkbox-label">Rechtsbijstand <span class="info-icon" title="Biedt juridische bijstand omtrent een geschil met betrekking tot uw motorrijtuig.">ℹ️</span></label>
-        </div>
-    </div>
-</div>
+            <div class="step-content" id="step2">
+                <div class="form-group">
+                    <label for="kenteken">Kenteken:</label>
+                    <input type="text" id="kenteken" name="kenteken" autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                    <label for="merk">Merk:</label>
+                    <input type="text" id="merk" name="merk" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="model">Model:</label>
+                    <input type="text" id="model" name="model" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="meldcode">Meldcode: <span class="info-icon" title="De meldcode is de laatste 4 cijfers van het chassisnummer">ℹ️</span></label>
+                    <input type="text" id="meldcode" name="meldcode" maxlength="4" required>
+                </div>
+                <div class="form-group">
+                    <label>Gewenste dekking:</label>
+                    <div class="coverage-options">
+                        <div class="main-coverage">
+                          
+                            <div class="switch coverage-switch">
+                                <input type="radio" id="wa" name="main_coverage" value="wa" checked disabled>
+                                <label for="wa" class="switch-label always-selected">WA <span class="info-icon" title="Biedt alleen dekking bij schade aan derden en is wettelijk verplicht.">ℹ️</span></label>
+                                <input type="radio" id="casco-beperkt" name="main_coverage" value="casco-beperkt">
+                                <label for="casco-beperkt" class="switch-label">Casco Beperkt <span class="info-icon" title="Casco Beperkt biedt dekking voor schade aan het eigen voertuig als gevolg van o.a. brand, diefstal, inbraak, ruitschade.">ℹ️</span></label>
+                                <input type="radio" id="casco-compleet" name="main_coverage" value="casco-compleet">
+                                <label for="casco-compleet" class="switch-label">Casco Compleet <span class="info-icon" title="Ook wel bekend als All Risk, biedt dekking voor schade aan uw eigen voertuig als gevolg van alle van buiten komende onheilen.">ℹ️</span></label>
+                            </div>
+                        </div>
+                        <div class="extra-options">
+                            <h4>Extra opties</h4>
+                            <div class="switch coverage-switch">
+                                <input type="checkbox" id="schadeverzekering" name="extra_schadeverzekering">
+                                <label for="schadeverzekering" class="switch-label">Schadeverzekering voor Inzittenden <span class="info-icon" title="Dekt zowel materiële als immateriële schade van de bestuurder en inzittenden.">ℹ️</span></label>
+                                <input type="checkbox" id="rechtsbijstand" name="extra_rechtsbijstand">
+                                <label for="rechtsbijstand" class="switch-label">Rechtsbijstand <span class="info-icon" title="Biedt juridische bijstand omtrent een geschil met betrekking tot uw motorrijtuig.">ℹ️</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<!-- Step 3: Verzendgegevens -->
-<div class="step-content" id="step3">
-    <div class="form-group">
-        <label for="email">E-mailadres:</label>
-        <input type="email" id="email" name="email" autocomplete="email" required>
-    </div>
-    <div class="form-group">
-        <label for="telefoon">Telefoonnummer:</label>
-        <input type="tel" id="telefoon" name="telefoon" autocomplete="tel" required>
-    </div>
-    <div class="form-group">
-        <label for="datum-verzoek">Datum verzoek:</label>
-        <input type="date" id="datum-verzoek" name="datum-verzoek" autocomplete="off" required>
-    </div>
-    <div class="form-group">
-        <div class="checkbox-group horizontal">
-            <input type="checkbox" id="ford-dekker" name="ford-dekker">
-            <label for="ford-dekker">Ja, verzekerde voertuig betreft een Ford gekocht bij de Dekkerautogroep.</label>
-            <input type="checkbox" id="waarheid" name="waarheid" required>
-            <label for="waarheid">Ja, ik heb de betreffende gegevens naar waarheid ingevuld.</label>
-        </div>
-    </div>
-    <button type="button" class="submit-button" onclick="showModal()">Offerte aanvragen</button>
-</div>
+            <!-- Step 3: Verzendgegevens -->
+            <div class="step-content" id="step3">
+                <div class="form-group">
+                    <label for="email">E-mailadres:</label>
+                    <input type="email" id="email" name="email" autocomplete="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefoon">Telefoonnummer:</label>
+                    <input type="tel" id="telefoon" name="telefoon" autocomplete="tel" required>
+                </div>
+                <div class="form-group">
+                    <label for="datum-verzoek">Datum verzoek:</label>
+                    <input type="date" id="datum-verzoek" name="datum-verzoek" autocomplete="off" required>
+                </div>
+                <div class="form-group">
+                    <div class="switch confirmation-switch">
+                        <input type="checkbox" id="ford-dekker" name="ford-dekker">
+                        <label for="ford-dekker" class="switch-label">Ja, verzekerde voertuig betreft een auto gekocht bij de Dekkerautogroep</label>
+                    </div>
+                    <div class="switch confirmation-switch">
+                        <input type="checkbox" id="waarheid" name="waarheid" required>
+                        <label for="waarheid" class="switch-label">Ja, ik heb de betreffende gegevens naar waarheid ingevuld</label>
+                    </div>
+                </div>
+                <button type="button" class="submit-button" onclick="showModal()">Offerte aanvragen</button>
+            </div>
 
             <!-- Navigation Buttons -->
             <div class="navigation-buttons text-center">
