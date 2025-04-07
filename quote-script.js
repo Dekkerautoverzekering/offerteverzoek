@@ -132,12 +132,26 @@ function showModal() {
     let summaryHtml = "<strong>Ingevulde gegevens:</strong><ul>";
 
     for (let [key, value] of formData.entries()) {
-        if (value && value !== 'on') {
+        if (value && value !== 'on' && key !== 'main_coverage' && key !== 'extra_schadeverzekering' && key !== 'extra_rechtsbijstand' && key !== 'ford-dekker' && key !== 'waarheid') {
             summaryHtml += `<li>${key}: ${value}</li>`;
-        } else if (key === 'ford-dekker' || key === 'waarheid') {
-            summaryHtml += `<li>${key}: ${formData.has(key) ? 'Ja' : 'Nee'}</li>`;
         }
     }
+
+    const mainCoverage = formData.get('main_coverage');
+    summaryHtml += `<li>Hoofddekking: ${mainCoverage}</li>`;
+
+    const extraSchadeverzekering = formData.has('extra_schadeverzekering') ? 'Ja' : 'Nee';
+    summaryHtml += `<li>Schadeverzekering voor Inzittenden: ${extraSchadeverzekering}</li>`;
+
+    const extraRechtsbijstand = formData.has('extra_rechtsbijstand') ? 'Ja' : 'Nee';
+    summaryHtml += `<li>Rechtsbijstand: ${extraRechtsbijstand}</li>`;
+
+    const fordDekker = formData.has('ford-dekker') ? 'Ja' : 'Nee';
+    summaryHtml += `<li>Verzekerde voertuig betreft een Ford gekocht bij de Dekkerautogroep: ${fordDekker}</li>`;
+
+    const waarheid = formData.has('waarheid') ? 'Ja' : 'Nee';
+    summaryHtml += `<li>Gegevens naar waarheid ingevuld: ${waarheid}</li>`;
+
     summaryHtml += "</ul>";
 
     document.getElementById('summary').innerHTML = summaryHtml;
@@ -160,37 +174,42 @@ function handleSubmit(isConfirmed) {
         const email = formData.get('email');
 
         for (let [key, value] of formData.entries()) {
-            if (value && value !== 'on') {
+            if (value && value !== 'on' && key !== 'main_coverage' && key !== 'extra_schadeverzekering' && key !== 'extra_rechtsbijstand' && key !== 'ford-dekker' && key !== 'waarheid') {
                 emailBody += `${key}: ${value}\n`;
-            } else if (key === 'ford-dekker' || key === 'waarheid') {
-                emailBody += `${key}: ${formData.has(key) ? 'Ja' : 'Nee'}\n`;
             }
         }
 
-        console.log("EmailJS Poging 1 - Service E-mail:");
-        console.log("Service-ID:", "service_cjvbpt6");
-        console.log("Template-ID:", "template_lglwx6m");
-        console.log("Parameters:", { message: emailBody, reply_to: email });
+        const mainCoverage = formData.get('main_coverage');
+        emailBody += `Hoofddekking: ${mainCoverage}\n`;
+
+        const extraSchadeverzekering = formData.has('extra_schadeverzekering') ? 'Ja' : 'Nee';
+        emailBody += `Schadeverzekering voor Inzittenden: ${extraSchadeverzekering}\n`;
+
+        const extraRechtsbijstand = formData.has('extra_rechtsbijstand') ? 'Ja' : 'Nee';
+        emailBody += `Rechtsbijstand: ${extraRechtsbijstand}\n`;
+
+        const fordDekker = formData.has('ford-dekker') ? 'Ja' : 'Nee';
+        emailBody += `Verzekerde voertuig betreft een Ford gekocht bij de Dekkerautogroep: ${fordDekker}\n`;
+
+        const waarheid = formData.has('waarheid') ? 'Ja' : 'Nee';
+        emailBody += `Gegevens naar waarheid ingevuld: ${waarheid}\n`;
+
+        console.log("Start verzending...");
 
         emailjs.send("service_cjvbpt6", "template_lglwx6m", {
             message: emailBody,
             reply_to: email
         })
-        .then((response) => {
-            console.log("Service e-mail succesvol verzonden:", response);
-            console.log("EmailJS Poging 2 - Klant E-mail:");
-            console.log("Service-ID:", "service_cjvbpt6");
-            console.log("Template-ID:", "template_20jbe7c");
-            console.log("Parameters:", { to_email: email, email: email, message: "Bedankt voor uw offerteverzoek!\n\nHieronder uw ingevulde gegevens:\n" + emailBody });
-
+        .then(() => {
+            console.log("Service e-mail succesvol verzonden");
             return emailjs.send("service_cjvbpt6", "template_20jbe7c", {
                 to_email: email,
                 email: email,
                 message: "Bedankt voor uw offerteverzoek!\n\nHieronder uw ingevulde gegevens:\n" + emailBody
             });
         })
-        .then((response) => {
-            console.log("Klant e-mail succesvol verzonden:", response);
+        .then(() => {
+            console.log("Klant e-mail succesvol verzonden");
             resultTextElement.innerHTML = `
                 <strong>Uw offerteverzoek is verzonden!</strong><br><br>
                 Wij danken u voor uw interesse.<br>
