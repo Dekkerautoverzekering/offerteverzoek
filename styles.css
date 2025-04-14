@@ -397,6 +397,69 @@ button:hover {
     min-height: 150vh;
 }
 
+/* Loading screen voor pagina laden */
+#page-loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease;
+}
+
+#page-loading-screen.hidden {
+    opacity: 0;
+}
+
+.page-loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+/* Loading screen voor acties */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+}
+
+.loader {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Mobiele aanpassingen */
 @media (max-width: 600px) {
     body {
@@ -486,41 +549,15 @@ button:hover {
         padding: 15px;
     }
 
-    .loading-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.9);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-    }
-
-    .loader {
-        border: 8px solid #f3f3f3; /* Lichtgrijs */
-        border-top: 8px solid #3498db; /* Blauw */
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+    .page-loader, .loader {
+        width: 50px;
+        height: 50px;
+        border-width: 6px;
     }
 
     .loading-screen p {
-        margin-top: 20px;
-        font-size: 18px;
-        color: #333;
-    }
-
-    .hidden {
-        display: none;
+        font-size: 14px;
+        padding: 0 20px;
+        text-align: center;
     }
 }
