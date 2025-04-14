@@ -164,14 +164,38 @@ function closeModal() {
 }
 
 function handleSubmit(isConfirmed) {
-    document.getElementById('confirmationModal').style.display = 'none';
+    const loadingScreen = document.getElementById('loadingScreen');
     const resultTextElement = document.getElementById('resultText');
+    document.getElementById('confirmationModal').style.display = 'none';
 
     if (isConfirmed) {
+        // Toon loading screen DIRECT
+        requestAnimationFrame(() => {
+            loadingScreen.style.transition = 'none'; // Schakel transitie uit voor instant tonen
+            loadingScreen.style.display = 'flex';
+            loadingScreen.style.opacity = '1';
+            // Herstel transitie voor fade-out
+            setTimeout(() => {
+                loadingScreen.style.transition = 'opacity 0.3s ease';
+            }, 0);
+        });
+
         const form = document.getElementById('quote-form');
         const formData = new FormData(form);
         let emailBody = "Offerteverzoek Dekkerautoverzekering\n\n";
         const email = formData.get('email');
+
+        // Controleer of e-mailadres is ingevuld
+        if (!email) {
+            console.error("FOUT: Geen e-mailadres opgehaald uit het formulier!");
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                resultTextElement.innerHTML = 'FOUT: Geen e-mailadres opgegeven. Vul een geldig e-mailadres in.';
+                document.getElementById('resultMessage').style.display = 'block';
+            }, 300);
+            return;
+        }
 
         for (let [key, value] of formData.entries()) {
             if (value && value !== 'on' && key !== 'main_coverage' && key !== 'extra_schadeverzekering' && key !== 'extra_rechtsbijstand' && key !== 'ford-dekker' && key !== 'waarheid') {
@@ -210,38 +234,53 @@ function handleSubmit(isConfirmed) {
         })
         .then(() => {
             console.log("Klant e-mail succesvol verzonden");
-            resultTextElement.innerHTML = `
-                <strong>Uw offerteverzoek is verzonden!</strong><br><br>
-                Wij danken u voor uw interesse.<br>
-                Een bevestiging is gestuurd naar ${email}.<br>
-                Binnen 2 werkdagen ontvangt u een offerte.
-            `;
-            document.getElementById('resultMessage').style.display = 'block';
-            document.getElementById('quote-form').style.display = 'none';
-            document.querySelector('.navigation-buttons').style.display = 'none';
-
+            // Verberg loading screen met fade-out
+            loadingScreen.classList.add('hidden');
             setTimeout(() => {
-                document.getElementById('resultMessage').style.display = 'none';
-                document.getElementById('loadingScreen').style.display = 'flex';
-                
+                loadingScreen.style.display = 'none';
+                resultTextElement.innerHTML = `
+                    <strong>Uw offerteverzoek is verzonden!</strong><br><br>
+                    Wij danken u voor uw interesse.<br>
+                    Een bevestiging is gestuurd naar ${email}.<br>
+                    Binnen 2 werkdagen ontvangt u een offerte.
+                `;
+                document.getElementById('resultMessage').style.display = 'block';
+                document.getElementById('quote-form').style.display = 'none';
+                document.querySelector('.navigation-buttons').style.display = 'none';
+
+                // Toon loading screen opnieuw voor redirect
                 setTimeout(() => {
-                    window.location.href = 'https://www.klaasvis.nl';
-                }, 3000);
-            }, 2000);
+                    loadingScreen.style.display = 'flex';
+                    loadingScreen.classList.remove('hidden');
+                    setTimeout(() => {
+                        window.location.href = 'https://www.klaasvis.nl';
+                    }, 3000);
+                }, 2000); // Laat succesbericht 2 seconden zien
+            }, 300);
         })
         .catch((error) => {
             console.error("Fout bij verzenden:", error);
-            resultTextElement.innerHTML = `
-                Er is een fout opgetreden: ${error.text}<br>
-                Controleer de console (F12) voor meer info.
-            `;
-            document.getElementById('resultMessage').style.display = 'block';
+            // Verberg loading screen met fade-out
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                resultTextElement.innerHTML = `
+                    Er is een fout opgetreden: ${error.text}<br>
+                    Controleer de console (F12) voor meer info.
+                `;
+                document.getElementById('resultMessage').style.display = 'block';
+            }, 300);
         });
     } else {
-        resultTextElement.innerHTML = `
-            U wordt teruggeleid naar het formulier om uw antwoorden te controleren.
-        `;
-        document.getElementById('resultMessage').style.display = 'block';
+        // Verberg loading screen (voor de zekerheid)
+        loadingScreen.classList.add('hidden');
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            resultTextElement.innerHTML = `
+                U wordt teruggeleid naar het formulier om uw antwoorden te controleren.
+            `;
+            document.getElementById('resultMessage').style.display = 'block';
+        }, 300);
     }
 }
 
