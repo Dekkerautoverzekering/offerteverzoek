@@ -15,6 +15,11 @@
     </script>
 </head>
 <body>
+    <!-- Loading screen voor pagina laden -->
+    <div id="page-loading-screen">
+        <div class="page-loader"></div>
+    </div>
+
     <div class="logo">
         <img src="AfbeeldingDekker.png" alt="Dekkerautoverzekering">
         <h2>Offerteverzoek</h2>
@@ -104,7 +109,6 @@
                     <label>Gewenste dekking:</label>
                     <div class="coverage-options">
                         <div class="main-coverage">
-                          
                             <div class="switch coverage-switch">
                                 <input type="radio" id="wa" name="main_coverage" value="wa" checked disabled>
                                 <label for="wa" class="switch-label always-selected">WA <span class="info-icon" title="Biedt alleen dekking bij schade aan derden en is wettelijk verplicht.">ℹ️</span></label>
@@ -142,7 +146,7 @@
                     <input type="date" id="datum-verzoek" name="datum-verzoek" autocomplete="off" required>
                 </div>
                 <div class="form-group">
-                                        <label>Selecteer wat van toepassing is:</label>
+                    <label>Selecteer wat van toepassing is:</label>
                     <div class="switch confirmation-switch">
                         <input type="checkbox" id="ford-dekker" name="ford-dekker">
                         <label for="ford-dekker" class="switch-label">Ja, verzekerde voertuig betreft een auto gekocht bij Dekkerautogroep BV</label>
@@ -192,7 +196,19 @@
         </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="quote-script.js?v=1"></script>
+    <!-- Inline JS voor page-loading-screen -->
+    <script>
+        // Pagina loading screen
+        window.addEventListener('load', function() {
+            const pageLoadingScreen = document.getElementById('page-loading-screen');
+            setTimeout(() => {
+                pageLoadingScreen.classList.add('hidden');
+                setTimeout(() => {
+                    pageLoadingScreen.style.display = 'none';
+                }, 300);
+            }, 500);
+        });
+    </script>
 </body>
 </html>
